@@ -1,0 +1,18 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+myvenv/
+venv/
+.venv/
+env/
+
+# SSL / TLS certificates (should not be checked into Git)
+module_a_traffic/server.crt
+module_a_traffic/server.key
+*.crt
+*.key
+*.pem
