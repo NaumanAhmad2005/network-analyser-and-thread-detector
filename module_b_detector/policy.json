@@ -1,0 +1,31 @@
+{
+  "_comment": "Module B — Security Policy Profile",
+  "_description": "Defines which ports/services are AUTHORIZED vs ROGUE on this network.",
+
+  "policy_version": "1.0",
+  "organization":   "IS Lab Project — Network Security Demo",
+
+  "authorized_ports": {
+    "22":  { "service": "SSH",   "protocol": "TCP", "note": "Encrypted remote shell — approved" },
+    "443": { "service": "HTTPS", "protocol": "TCP", "note": "Encrypted web traffic — approved"  },
+    "8443":{ "service": "HTTPS-alt", "protocol": "TCP", "note": "Lab HTTPS server — approved"  },
+    "53":  { "service": "DNS",   "protocol": "UDP", "note": "Name resolution — approved"        }
+  },
+
+  "rogue_ports": {
+    "21":  { "service": "FTP",    "risk": "HIGH",     "reason": "Cleartext file transfer — credentials exposed on wire" },
+    "23":  { "service": "Telnet", "risk": "CRITICAL",  "reason": "Cleartext remote shell — complete session hijack possible" },
+    "80":  { "service": "HTTP",   "risk": "HIGH",     "reason": "Unencrypted web traffic — credentials and data exposed" },
+    "110": { "service": "POP3",   "risk": "HIGH",     "reason": "Cleartext email retrieval — password sniffable" },
+    "143": { "service": "IMAP",   "risk": "HIGH",     "reason": "Cleartext email access — credentials exposed" },
+    "8000":{ "service": "HTTP-dev","risk": "MEDIUM",  "reason": "Unauthenticated dev HTTP server — no encryption" },
+    "512": { "service": "rexec",  "risk": "CRITICAL",  "reason": "Remote execution without encryption — legacy threat" },
+    "513": { "service": "rlogin", "risk": "CRITICAL",  "reason": "Remote login without encryption — legacy threat" },
+    "514": { "service": "rsh",    "risk": "CRITICAL",  "reason": "Remote shell without encryption — legacy threat" },
+    "69":  { "service": "TFTP",   "risk": "HIGH",     "reason": "Trivial FTP — no authentication, no encryption" },
+    "161": { "service": "SNMP",   "risk": "MEDIUM",   "reason": "SNMPv1/v2 uses community strings in plaintext" }
+  },
+
+  "unknown_port_policy": "WARN",
+  "_note_unknown": "Ports not in either list are flagged as UNKNOWN — warranting manual review"
+}
