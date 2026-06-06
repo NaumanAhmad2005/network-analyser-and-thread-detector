@@ -91,24 +91,23 @@ def _drain_proc_output(proc: subprocess.Popen, tag: str, color: str):
 # =============================================================================
 
 BANNER = r"""
-  ██╗███████╗    ██╗      █████╗ ██████╗
-  ██║██╔════╝    ██║     ██╔══██╗██╔══██╗
-  ██║███████╗    ██║     ███████║██████╔╝
-  ██║╚════██║    ██║     ██╔══██║██╔══██╗
-  ██║███████║    ███████╗██║  ██║██████╔╝
-  ╚═╝╚══════╝    ╚══════╝╚═╝  ╚═╝╚═════╝
+    _   ________________  _____ 
+   / | / /  _/_  __/ __ \/ ___/ 
+  /  |/ // /  / / / / / /\__ \  
+ / /|  // /  / / / /_/ /___/ /  
+/_/ |_/___/ /_/ /_____//____/   
 """
 
-SUBTITLE = "Network Traffic Inspection & Rogue Service Detection System"
+SUBTITLE = "Network Inspection & Threat Detection System"
 
 
 def render_banner() -> Panel:
     t = Text()
     t.append(BANNER, style="bold cyan")
     t.append(f"\n  {SUBTITLE}\n", style="bold white")
-    t.append("  IS Lab Final Project · Information Security · 4th Semester\n",
+    t.append("  NITDS Final Project · Information Security · 4th Semester\n",
              style="dim white")
-    return Panel(Align.center(t), border_style="cyan", box=box.DOUBLE)
+    return Panel(Align.center(t), border_style="cyan", box=box.DOUBLE, expand=False, width=100)
 
 
 def render_status_bar() -> Table:
@@ -136,7 +135,7 @@ def render_log_panel(n: int = 12) -> Panel:
     lines = list(_state["log_lines"])[-n:]
     body  = "\n".join(lines) if lines else "[dim]No activity yet.[/dim]"
     return Panel(body, title="[bold]Activity Log[/bold]",
-                 border_style="dim white", height=n + 2)
+                 border_style="dim white", height=n + 2, expand=False, width=100)
 
 
 # =============================================================================
@@ -169,7 +168,7 @@ def draw_main_menu():
         show_header=True,
         header_style="bold cyan",
         expand=False,
-        min_width=70,
+        width=100,
     )
     table.add_column("Key",    width=5,  justify="center", style="bold yellow")
     table.add_column("Module", width=22, style="cyan")
@@ -525,45 +524,6 @@ def show_live_log():
         pass
 
 
-# =============================================================================
-# Quick-command reference panel
-# =============================================================================
-
-def show_quick_commands():
-    """Render a reference table of curl/browser commands for demos."""
-    table = Table(
-        title="[bold cyan]Quick Demo Commands[/bold cyan]",
-        box=box.MINIMAL_DOUBLE_HEAD, border_style="dim cyan",
-        expand=True, show_header=True, header_style="bold"
-    )
-    table.add_column("Test Case", style="bold yellow", width=12)
-    table.add_column("Command / URL")
-
-    cmds = [
-        ("TC-01\nHTTP",
-         "[dim]# Submit login over plain HTTP (run in another terminal)[/dim]\n"
-         "curl -d 'username=alice&password=secret123' http://localhost:8000/login\n"
-         "[dim]# Or open browser:[/dim]  http://localhost:8000"),
-        ("TC-02\nHTTPS",
-         "[dim]# Submit login over TLS (sniffer should show only TLS records)[/dim]\n"
-         "curl -k -d 'username=alice&password=secret123' https://localhost:8443/login\n"
-         "[dim]# Or open browser:[/dim]  https://localhost:8443  (accept cert warning)"),
-        ("TC-03\nAudit",
-         "[dim]# Scan localhost directly[/dim]\n"
-         "python3 module_b_detector/network_auditor.py --subnet 127.0.0.1 --skip-discovery\n"
-         "[dim]# Scan a VM subnet[/dim]\n"
-         "python3 module_b_detector/network_auditor.py --subnet 192.168.56.0/24"),
-        ("TC-04\nRogue",
-         "[dim]# Open rogue Telnet port (in another terminal, requires sudo)[/dim]\n"
-         "sudo nc -lvp 23\n"
-         "[dim]# Then re-run the auditor — it flags port 23 as CRITICAL[/dim]"),
-    ]
-
-    for tc, cmd in cmds:
-        table.add_row(tc, cmd)
-        table.add_row("", "")
-
-    return table
 
 
 # =============================================================================
@@ -603,7 +563,7 @@ def _check_tools():
 
 def main():
     _check_tools()
-    log("IS Lab Dashboard started.", "INIT", "cyan")
+    log("NITDS Dashboard started.", "INIT", "cyan")
 
     DISPATCH = {
         "1": start_http_server,
@@ -623,14 +583,12 @@ def main():
 
     while True:
         console.clear()
-        console.print(render_banner())
-        console.print(Panel(render_status_bar(), border_style="dim", height=3))
+        console.print(Align.center(render_banner()))
+        console.print(Align.center(Panel(render_status_bar(), border_style="dim", height=3, expand=False, width=100)))
         console.print()
         console.print(Align.center(draw_main_menu()))
         console.print()
-        console.print(show_quick_commands())
-        console.print()
-        console.print(render_log_panel(n=6))
+        console.print(Align.center(render_log_panel(n=6)))
         console.print()
 
         try:
