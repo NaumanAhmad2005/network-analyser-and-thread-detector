@@ -238,9 +238,16 @@ def sniff_http_tshark(interface: str, packet_count: int):
             if len(parts) >= 3:
                 src, dst, payload = parts[0], parts[1], parts[2]
 
-                # URL-decode the form data
+                # Decode hex-encoded or colon-separated payload format if output by tshark
                 try:
-                    params = urllib.parse.parse_qs(urllib.parse.unquote_plus(payload))
+                    cleaned_payload = payload.replace(":", "")
+                    try:
+                        decoded_payload = bytes.fromhex(cleaned_payload).decode("utf-8", errors="ignore")
+                    except ValueError:
+                        decoded_payload = payload
+
+                    # Parse query parameters from the decoded payload
+                    params = urllib.parse.parse_qs(urllib.parse.unquote_plus(decoded_payload))
                     username = params.get("username", ["?"])[0]
                     password = params.get("password", ["?"])[0]
                 except Exception:
