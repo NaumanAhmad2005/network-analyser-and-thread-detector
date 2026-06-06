@@ -25,33 +25,185 @@ LOGIN_PAGE_HTML = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Insecure Login (HTTP Demo)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InstaLogin - Security Baseline Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {{ font-family: Arial, sans-serif; background: #f0f2f5;
-               display: flex; justify-content: center; align-items: center;
-               height: 100vh; margin: 0; }}
-        .box {{ background: white; padding: 40px; border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 320px; }}
-        h2   {{ color: #cc0000; text-align: center; margin-bottom: 8px; }}
-        .warn{{ color: #cc0000; font-size: 12px; text-align: center;
-                margin-bottom: 20px; }}
-        input{{ width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box;
-                border: 1px solid #ddd; border-radius: 4px; }}
-        button{{ width: 100%; padding: 12px; background: #cc0000; color: white;
-                 border: none; border-radius: 4px; cursor: pointer; font-size: 15px; }}
-        button:hover {{ background: #aa0000; }}
+        * {{
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }}
+        body {{
+            background-color: #fafafa;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }}
+        .container {{
+            width: 100%;
+            max-width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }}
+        .login-box {{
+            background-color: #fff;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            padding: 40px 30px 25px 30px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }}
+        .logo {{
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-style: italic;
+            letter-spacing: -1px;
+        }}
+        .demo-badge {{
+            display: inline-block;
+            padding: 5px 12px;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }}
+        .form-group {{
+            position: relative;
+            margin-bottom: 8px;
+        }}
+        .form-group input {{
+            width: 100%;
+            padding: 12px 10px;
+            background: #fafafa;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #262626;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }}
+        .form-group input:focus {{
+            border-color: #a8a8a8;
+            background: #fff;
+        }}
+        .login-btn {{
+            width: 100%;
+            background-color: #0095f6;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background-color 0.2s ease;
+        }}
+        .login-btn:hover {{
+            background-color: #1877f2;
+        }}
+        .divider {{
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #8e8e8e;
+            font-size: 12px;
+            font-weight: 600;
+        }}
+        .divider::before, .divider::after {{
+            content: "";
+            flex: 1;
+            height: 1px;
+            background-color: #dbdbdb;
+        }}
+        .divider span {{
+            padding: 0 10px;
+        }}
+        .fb-login {{
+            color: #385185;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            margin-bottom: 15px;
+            margin-top: 10px;
+        }}
+        .fb-icon {{
+            font-weight: bold;
+            font-size: 16px;
+        }}
+        .info-box {{
+            background-color: #fff;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #262626;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }}
+        .info-box a {{
+            color: #0095f6;
+            text-decoration: none;
+            font-weight: 600;
+        }}
+        .message-container {{
+            margin-top: 15px;
+            font-size: 13px;
+        }}
     </style>
 </head>
 <body>
-  <div class="box">
-    <h2>⚠ Insecure HTTP Login</h2>
-    <p class="warn">[ No Encryption — Credentials sent in PLAINTEXT ]</p>
-    <form method="POST" action="/login">
-      <input type="text"     name="username" placeholder="Username" required>
-      <input type="password" name="password" placeholder="Password" required>
-      <button type="submit">Login (Unencrypted)</button>
-    </form>
-    {message}
+  <div class="container">
+    <div class="login-box">
+      <div class="logo">InstaLogin</div>
+      <span class="demo-badge">⚠ HTTP PLAINTEXT DEMO</span>
+      
+      <form method="POST" action="/login">
+        <div class="form-group">
+          <input type="text" name="username" placeholder="Phone number, username, or email" required>
+        </div>
+        <div class="form-group">
+          <input type="password" name="password" placeholder="Password" required>
+        </div>
+        <button type="submit" class="login-btn">Log In</button>
+      </form>
+      
+      <div class="divider">
+        <span>OR</span>
+      </div>
+      
+      <a href="#" class="fb-login">
+        <span class="fb-icon">f</span> Log in with Facebook
+      </a>
+      
+      <div class="message-container">
+        {message}
+      </div>
+    </div>
+    
+    <div class="info-box">
+      Don't have an account? <a href="#">Sign up</a>
+    </div>
   </div>
 </body>
 </html>"""
