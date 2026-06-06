@@ -286,9 +286,18 @@ def start_sniffer(mode: str):
 
     _check_root_for_sniff()
 
-    script  = str(MOD_A / "sniffer_agent.py")
-    iface   = "lo"   # loopback — safe for local demo
-    cmd     = [sys.executable, script, "--mode", mode, "--interface", iface, "--count", "500"]
+    script = str(MOD_A / "sniffer_agent.py")
+    iface  = "lo"   # loopback — safe for local demo
+
+    # Build base command — no --count so sniffer runs until stopped manually
+    py_cmd = [sys.executable, script, "--mode", mode, "--interface", iface]
+
+    # Prepend sudo if we are not already root, so tshark can open the interface
+    if os.geteuid() != 0:
+        cmd = ["sudo", "-n"] + py_cmd   # -n = non-interactive (no password prompt)
+        log("Launching sniffer via 'sudo -n' (passwordless sudo required for tshark).", "SNIFF", "yellow")
+    else:
+        cmd = py_cmd
 
     proc = subprocess.Popen(
         cmd,
@@ -302,11 +311,11 @@ def start_sniffer(mode: str):
                      daemon=True).start()
 
     if mode == "http":
-        log(f"Sniffer started in HTTP mode on 'lo' — waiting for credentials on port {HTTP_PORT}", "SNIFF", "magenta")
-        log("Now submit the login form or run TC-01 curl command.", "HINT", "yellow")
+        log(f"Sniffer ACTIVE — HTTP mode on 'lo', port {HTTP_PORT}. Press [8] to stop.", "SNIFF", "magenta")
+        log("Submit the login form at http://localhost:8000 to capture credentials.", "HINT", "yellow")
     else:
-        log(f"Sniffer started in HTTPS mode on 'lo' — watching TLS handshake on port {HTTPS_PORT}", "SNIFF", "cyan")
-        log("Now access https://localhost:8443 to trigger the TLS handshake.", "HINT", "yellow")
+        log(f"Sniffer ACTIVE — HTTPS mode on 'lo', port {HTTPS_PORT}. Press [8] to stop.", "SNIFF", "cyan")
+        log("Access https://localhost:8443 to trigger the TLS handshake.", "HINT", "yellow")
 
 
 def stop_sniffer():
