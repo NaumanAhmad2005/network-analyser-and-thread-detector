@@ -193,7 +193,7 @@ def start_http_server():
 
     script = str(MOD_A / "insecure_server.py")
     proc = subprocess.Popen(
-        [sys.executable, script],
+        [sys.executable, "-u", script],
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
         text=True, bufsize=1
     )
@@ -249,7 +249,7 @@ def start_https_server():
 
     script = str(MOD_A / "secure_server.py")
     proc = subprocess.Popen(
-        [sys.executable, script],
+        [sys.executable, "-u", script],
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
         text=True, bufsize=1
     )
@@ -290,7 +290,7 @@ def start_sniffer(mode: str):
     iface  = "lo"   # loopback — safe for local demo
 
     # Build base command — no --count so sniffer runs until stopped manually
-    py_cmd = [sys.executable, script, "--mode", mode, "--interface", iface]
+    py_cmd = [sys.executable, "-u", script, "--mode", mode, "--interface", iface]
 
     # Prepend sudo if we are not already root, so tshark can open the interface
     if os.geteuid() != 0:
