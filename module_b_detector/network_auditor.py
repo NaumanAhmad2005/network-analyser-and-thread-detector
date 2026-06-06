@@ -189,6 +189,8 @@ def scan_host_services(ip: str, nmap_bin: str) -> list:
         "-sT",              # TCP connect (no raw socket needed)
         "--open",           # Only open ports
         "--top-ports", "1000",
+        "--version-light",  # Fast version scan (prevents hanging on silent sockets like nc)
+        "--max-retries", "1", # Speed up scan
         ip
     ]
 

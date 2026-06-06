@@ -404,9 +404,19 @@ def run_rogue_demo():
     console.print("\n[bold red]  → Starting rogue Telnet listener on port 23...[/bold red]")
     rogue_proc = None
     try:
+        # Build command: use sudo -n so it doesn't hang on a hidden password prompt
+        cmd_prefix = ["sudo", "-n"] if os.geteuid() != 0 else []
+        
+        # We pipe a fake banner into nc so nmap's -sV version scan finishes instantly
+        # rather than hanging for 90 seconds waiting for data.
+        sh_cmd = f"echo 'Welcome to Rogue Telnet' | {nc_bin} -lvp 23"
+        rogue_cmd = cmd_prefix + ["sh", "-c", sh_cmd]
+
         rogue_proc = subprocess.Popen(
-            ["sudo", nc_bin, "-lvp", "23"],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            rogue_cmd,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL, 
+            stderr=subprocess.DEVNULL
         )
         log(f"Rogue listener started on port 23 (PID {rogue_proc.pid})", "ROGUE", "red")
         time.sleep(1)  # Let listener bind
