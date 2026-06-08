@@ -17,13 +17,18 @@
     "23":  { "service": "Telnet", "risk": "CRITICAL",  "reason": "Cleartext remote shell — complete session hijack possible" },
     "80":  { "service": "HTTP",   "risk": "HIGH",     "reason": "Unencrypted web traffic — credentials and data exposed" },
     "110": { "service": "POP3",   "risk": "HIGH",     "reason": "Cleartext email retrieval — password sniffable" },
+    "139": { "service": "NetBIOS", "risk": "HIGH",    "reason": "Legacy SMB/NetBIOS — exposes host info and shares; vulnerable to relay attacks" },
     "143": { "service": "IMAP",   "risk": "HIGH",     "reason": "Cleartext email access — credentials exposed" },
-    "8000":{ "service": "HTTP-dev","risk": "MEDIUM",  "reason": "Unauthenticated dev HTTP server — no encryption" },
+    "445": { "service": "SMB",    "risk": "CRITICAL",  "reason": "SMB file sharing exposed — highly susceptible to remote code execution (e.g. EternalBlue)" },
     "512": { "service": "rexec",  "risk": "CRITICAL",  "reason": "Remote execution without encryption — legacy threat" },
     "513": { "service": "rlogin", "risk": "CRITICAL",  "reason": "Remote login without encryption — legacy threat" },
     "514": { "service": "rsh",    "risk": "CRITICAL",  "reason": "Remote shell without encryption — legacy threat" },
     "69":  { "service": "TFTP",   "risk": "HIGH",     "reason": "Trivial FTP — no authentication, no encryption" },
-    "161": { "service": "SNMP",   "risk": "MEDIUM",   "reason": "SNMPv1/v2 uses community strings in plaintext" }
+    "161": { "service": "SNMP",   "risk": "MEDIUM",   "reason": "SNMPv1/v2 uses community strings in plaintext" },
+    "5001":{ "service": "Java-Obj", "risk": "CRITICAL", "reason": "Java Object Serialization — extremely vulnerable to Remote Code Execution (RCE) via insecure deserialization" },
+    "8000":{ "service": "HTTP-dev","risk": "MEDIUM",  "reason": "Unauthenticated dev HTTP server — no encryption" },
+    "8080":{ "service": "HTTP-alt", "risk": "HIGH",   "reason": "Unencrypted HTTP (Tomcat) — credentials exposed, admin console often targeted for brute force" },
+    "8081":{ "service": "HTTP-alt", "risk": "HIGH",   "reason": "Unencrypted HTTP (Jetty) — data transmitted in plaintext" }
   },
 
   "unknown_port_policy": "WARN",
