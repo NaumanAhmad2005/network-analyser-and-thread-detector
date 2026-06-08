@@ -471,43 +471,42 @@ def show_audit_results():
             "[yellow]No audit results yet. Run option [9] or [A] first.[/yellow]",
             border_style="yellow", title="[bold]Last Audit Results[/bold]"
         ))
-    else:
-        # Parse policy for a quick reference table
-        try:
-            policy = json.loads(POLICY.read_text())
-            rogue  = policy.get("rogue_ports", {})
-            auth   = policy.get("authorized_ports", {})
+    # Always show the policy reference table
+    try:
+        policy = json.loads(POLICY.read_text())
+        rogue  = policy.get("rogue_ports", {})
+        auth   = policy.get("authorized_ports", {})
 
-            table = Table(
-                title="[bold]Current Security Policy Reference[/bold]",
-                box=box.ROUNDED, border_style="dim",
-                show_header=True, header_style="bold cyan",
-                expand=True
+        table = Table(
+            title="[bold]Current Security Policy Reference[/bold]",
+            box=box.ROUNDED, border_style="dim",
+            show_header=True, header_style="bold cyan",
+            expand=True
+        )
+        table.add_column("Port", width=7,  justify="center")
+        table.add_column("Service", width=12)
+        table.add_column("Status", width=12, justify="center")
+        table.add_column("Risk",   width=10, justify="center")
+        table.add_column("Notes",  ratio=1)
+
+        for port, info in auth.items():
+            table.add_row(port, info["service"],
+                          "[green]AUTHORIZED[/green]", "[green]NONE[/green]",
+                          info.get("note", ""))
+
+        for port, info in rogue.items():
+            risk_color = {"CRITICAL": "red", "HIGH": "dark_orange",
+                          "MEDIUM": "yellow"}.get(info["risk"], "white")
+            table.add_row(
+                port, info["service"],
+                "[red]ROGUE[/red]",
+                f"[{risk_color}]{info['risk']}[/{risk_color}]",
+                info.get("reason", "")
             )
-            table.add_column("Port", width=7,  justify="center")
-            table.add_column("Service", width=12)
-            table.add_column("Status", width=12, justify="center")
-            table.add_column("Risk",   width=10, justify="center")
-            table.add_column("Notes",  ratio=1)
 
-            for port, info in auth.items():
-                table.add_row(port, info["service"],
-                              "[green]AUTHORIZED[/green]", "[green]NONE[/green]",
-                              info.get("note", ""))
-
-            for port, info in rogue.items():
-                risk_color = {"CRITICAL": "red", "HIGH": "dark_orange",
-                              "MEDIUM": "yellow"}.get(info["risk"], "white")
-                table.add_row(
-                    port, info["service"],
-                    "[red]ROGUE[/red]",
-                    f"[{risk_color}]{info['risk']}[/{risk_color}]",
-                    info.get("reason", "")
-                )
-
-            console.print(table)
-        except Exception as e:
-            console.print(f"[red]Could not load policy: {e}[/red]")
+        console.print(table)
+    except Exception as e:
+        console.print(f"[red]Could not load policy: {e}[/red]")
 
     console.print(render_log_panel(n=20))
     _press_enter()
