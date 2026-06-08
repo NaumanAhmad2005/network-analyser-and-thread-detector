@@ -274,41 +274,53 @@ def sniff_http_tshark(interface: str, packet_count: int):
 def sniff_https_tshark(interface: str, packet_count: int):
     """
     Fallback: tshark TLS handshake inspection for HTTPS traffic.
-    Shows TLS record types; payload remains encrypted.
+    Shows TLS record types clearly; payload remains encrypted and unreadable.
     """
     if not _check_tshark():
         print(f"  {RED}[ERROR] tshark not found.{RESET}")
         sys.exit(1)
 
-    print(f"\n  {CYAN}[tshark] Capturing TLS on '{interface}' port {HTTPS_PORT}...{RESET}")
-    print(f"  {YELLOW}Connect to https://localhost:{HTTPS_PORT} now.{RESET}\n")
+    print(f"\n  {CYAN}{'='*60}{RESET}")
+    print(f"  {CYAN}[TC-02] TLS/HTTPS TRAFFIC INSPECTOR{RESET}")
+    print(f"  {CYAN}{'='*60}{RESET}")
+    print(f"  {YELLOW}Capturing TLS packets on '{interface}' port {HTTPS_PORT}...{RESET}")
+    print(f"  {YELLOW}Submit the login form at https://localhost:{HTTPS_PORT}{RESET}")
+    print(f"  {DIM}(Unlike HTTP mode, credentials will NOT appear below){RESET}\n")
 
     cmd = [
         "tshark",
         "-i", interface,
         "-f", f"tcp port {HTTPS_PORT}",
-        "-c", str(packet_count),
         "-T", "fields",
         "-e", "ip.src",
         "-e", "ip.dst",
         "-e", "tls.record.content_type",
         "-e", "tls.handshake.type",
+        "-e", "tcp.len",
         "-l",
     ]
 
     content_type_map = {
-        "20": "Change Cipher Spec",
-        "21": "Alert",
-        "22": "Handshake",
-        "23": "Application Data [ENCRYPTED]",
+        "20": ("Change Cipher Spec",  YELLOW),
+        "21": ("Alert",               RED),
+        "22": ("Handshake",           CYAN),
+        "23": ("Application Data",    GREEN),
     }
     handshake_map = {
-        "1": "Client Hello", "2": "Server Hello",
-        "11": "Certificate", "14": "Server Hello Done",
-        "16": "Client Key Exchange", "20": "Finished",
+        "1":  "Client Hello      (cipher suites offered)",
+        "2":  "Server Hello      (cipher selected)",
+        "4":  "New Session Ticket",
+        "11": "Certificate       (server public cert)",
+        "12": "Server Key Exchange",
+        "14": "Server Hello Done",
+        "16": "Client Key Exchange",
+        "20": "Finished          (handshake complete)",
     }
 
-    tls_count = 0
+    tls_count  = 0
+    enc_count  = 0
+    shake_done = False
+
     try:
         proc = subprocess.Popen(
             cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -318,19 +330,53 @@ def sniff_https_tshark(interface: str, packet_count: int):
             line = line.strip()
             if not line:
                 continue
-            parts = (line + "\t\t\t\t").split("\t")
-            src, dst = parts[0] or "?", parts[1] or "?"
-            ct  = content_type_map.get(parts[2].strip(), parts[2] or "TCP")
-            hs  = handshake_map.get(parts[3].strip(), "")
+            parts  = (line + "\t\t\t\t\t").split("\t")
+            src    = parts[0].strip() or "?"
+            dst    = parts[1].strip() or "?"
+            ct_raw = parts[2].strip()
+            hs_raw = parts[3].strip()
+            plen   = parts[4].strip() or "0"
+
+            ct_name, color = content_type_map.get(ct_raw, ("TCP Segment", DIM))
+            hs_label = handshake_map.get(hs_raw, "")
+
             tls_count += 1
 
-            color = GREEN if "ENCRYPTED" in ct else CYAN
-            print(f"  {color}[TLS #{tls_count:>3}] {src} → {dst}  | {ct}  {hs}{RESET}")
+            if ct_raw == "23":
+                enc_count += 1
+                if not shake_done:
+                    shake_done = True
+                    print(f"\n  {GREEN}{BOLD}{'─'*60}{RESET}")
+                    print(f"  {GREEN}{BOLD}  TLS HANDSHAKE COMPLETE — SESSION IS ENCRYPTED{RESET}")
+                    print(f"  {GREEN}{BOLD}{'─'*60}{RESET}")
+                    print(f"  {GREEN}  Any data below is ENCRYPTED CIPHERTEXT{RESET}")
+                    print(f"  {GREEN}  Username & password are INVISIBLE to the sniffer{RESET}\n")
+
+                bars = min(int(plen or 0) // 8, 40)
+                print(f"  {GREEN}{BOLD}[PKT #{tls_count:>3}] {src} -> {dst}{RESET}")
+                print(f"  {GREEN}         Type    : Application Data [TLS ENCRYPTED]{RESET}")
+                print(f"  {GREEN}         Size    : {plen} bytes of ciphertext{RESET}")
+                print(f"  {GREEN}         Payload : {'#' * bars} (unreadable){RESET}")
+                print(f"  {GREEN}         Status  : CREDENTIALS HIDDEN — TLS WORKING{RESET}\n")
+
+            elif ct_raw == "22":
+                print(f"  {CYAN}[PKT #{tls_count:>3}] {src} -> {dst}  |  Handshake: {hs_label}{RESET}")
+
+            elif ct_raw == "20":
+                print(f"  {YELLOW}[PKT #{tls_count:>3}] {src} -> {dst}  |  Change Cipher Spec — encryption starts{RESET}")
+
+            else:
+                print(f"  {DIM}[PKT #{tls_count:>3}] {src} -> {dst}  |  {ct_name}{RESET}")
 
     except KeyboardInterrupt:
         proc.terminate()
 
-    print(f"\n  {BOLD}[TC-02] TLS captured {tls_count} records — payload UNREADABLE.{RESET}\n")
+    print(f"\n  {CYAN}{'='*60}{RESET}")
+    print(f"  {BOLD}[TC-02] SUMMARY{RESET}")
+    print(f"  {CYAN}  Total TLS packets captured : {tls_count}{RESET}")
+    print(f"  {GREEN}  Encrypted data blobs seen  : {enc_count}{RESET}")
+    print(f"  {GREEN}  Credentials recovered      : NONE (TLS encryption works){RESET}")
+    print(f"  {CYAN}{'='*60}{RESET}\n")
 
 
 # ===========================================================================
